@@ -1,2 +1,5 @@
 build/
-*.txt
+osutils/subprojects/lua-*
+osutils/subprojects/packagecache
+.cache
+*.bak
