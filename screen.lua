@@ -28,23 +28,37 @@ M.fields = {
   'textinput';
   'wheelmoved'
 }
---- Pushes a new screen onto the stack
---- @param screen Screen
-function M:push(screen)
-  screen.stack = self
-  for _, name in ipairs(self.fields) do
+
+local function patch(screen)
+  for _, name in ipairs(M.fields) do
     if screen[name] == nil then
-      print('Overriding', name)
       screen[name] = function () end
     end
   end
-  table.insert(self.stack, screen)
+  return screen
+end
+
+local NOOP_SCREEN = patch({
+  update = function ()
+   love.event.quit(0)
+  end,
+  draw = function () end
+})
+
+--- Pushes a new screen onto the stack
+--- @param screen Screen
+function M:push(screen)
+  table.insert(self.stack, patch(screen))
+end
+
+function M:exec(newscreen)
+  self.stack[#self.stack] = patch(newscreen)
 end
 
 --- Returns the current stack frame
 --- @return Screen
 function M:peek()
-  return self.stack[#self.stack] or love.event.quit()
+  return self.stack[#self.stack] or NOOP_SCREEN
 end
 
 --- Removes the last stack frame

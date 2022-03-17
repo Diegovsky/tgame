@@ -19,6 +19,11 @@ local imagecache = {}
 local Atk = {}
 
 function Atk.new(name, dmg, sp)
+  dmg = tonumber(dmg)
+  sp = tonumber(sp)
+  if not dmg or not sp then
+    return nil
+  end
   return {name=name, dmg=dmg, sp=sp}
 end
 
@@ -26,6 +31,10 @@ utils.addloadhook(function ()
   imagecache[DEFAULT_IMAGE] = love.graphics.newImage(DEFAULT_IMAGE)
 end)
 
+
+---@param name string
+---@param imageurl string
+---@param atks Atk[]
 function M.new(name, imageurl, atks)
   return setmetatable({name=name, imgurl=imageurl, atks=atks or {}}, {__index=M})
 end
@@ -60,4 +69,4 @@ function M.load(data)
   return pmon
 end
 
-return M, Atk
+return {M, Atk}
