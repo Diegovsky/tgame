@@ -42,6 +42,7 @@ end
 function M:image()
   local img = imagecache[self.imgurl]
   if img == nil then
+    print('loading image ', self.imgurl)
     img = love.graphics.newImage(self.imgurl)
     imagecache[self.imgurl] = img
   end

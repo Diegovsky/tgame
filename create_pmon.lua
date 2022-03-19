@@ -1,12 +1,13 @@
 local Pmon, Atk = unpack(require "Pmon")
 
 --- @type UIScreen
-local screen = require("ui").new { atkc = 0 }
+local screen = require("ui").new { atkc = 4 }
 
 local name = { value = "" }
 local imgurl = { value = "" }
 local uisize = 30
-local atks = {}
+--- @type table<number,Atk>
+local atks = {0, 0, 0, 0}
 
 function screen:attackwin(atklist)
   local ui = self.ui
@@ -17,12 +18,12 @@ function screen:attackwin(atklist)
   if self.atkc > 4 then
     local normal = "Can only do 4 attacks"
     local schizo = ("I hate gabriel penis"):rep(2, " "):rep(10, "\n")
-    self:add("popup", self:popup("Warning", self.atkc == 4 and normal or schizo))
+    self.children:addpopup(self:popup("Warning", self.atkc == 4 and normal or schizo))
     return
   end
   local atkc = self.atkc
-  local winname = "atkwin" .. tostring(atkc)
-  self:add("window", function(tok)
+  local winname = tostring(self.atkc) .. "atk"
+  self.children:addwindow(function(tok)
     if
       ui:windowBegin(
         winname,
@@ -52,9 +53,9 @@ function screen:attackwin(atklist)
           if atk then
             ui:windowClose(winname)
             atklist[atkc] = atk
-            self:rm(tok)
+            self.children:rm(tok)
           else
-            self:add("popup", self:popup("Invalid number", "A field is wrong, dingus"))
+            self.children:addpopup(self:popup("Invalid number", "A field is wrong, dingus"))
           end
         end
       end
@@ -63,11 +64,9 @@ function screen:attackwin(atklist)
   end)
 end
 
-function screen:update(dt)
+function screen:draw_ui()
   local ui = self.ui
-  ui:frameBegin()
-  if ui:windowBegin("Pokemon add screen", 100, 100,
-    300, 360, "border", "title", "movable") then
+  self:window("Pokemon add screen", 100, 100, 300, 360, function()
     ui:layoutRow("dynamic", uisize, 2)
     ui:label "Name:"
     ui:edit("simple", name)
@@ -83,20 +82,17 @@ function screen:update(dt)
     if ui:button "Add Attack" then
       self:attackwin(atks)
     end
-    if #atks == 4 or true then
+    for i, atk in pairs(atks) do
+      ui:layoutRow("dynamic", uisize, 2)
+      ui:label(("Attack %d:"):format(i))
+      -- ui:label(atk.name)
+    end
+    if #atks == 4 then
       if ui:button "Finish!" then
-        SCREEN_STACK:pop()
+        SCREEN_STACK:exec(require'show_pmon':new(Pmon.new(name.value, imgurl.value, atks)))
       end
     end
-  end
-  self:showpopups()
-  ui:windowEnd()
-  self:showwindows()
-  ui:frameEnd()
-end
-
-function screen:draw()
-  self.ui:draw()
+  end)
 end
 
 return screen
