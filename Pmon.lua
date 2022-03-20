@@ -1,13 +1,10 @@
 local utils = require'utils'
 
-DEFAULT_IMAGE = 'assets/default.png'
-
 --- @class Pmon
 --- @field name string
 --- @field imgurl string
 --- @field atks Atk[]
 local M = {
-  imgurl = DEFAULT_IMAGE;
 }
 
 local imagecache = {}
@@ -27,9 +24,6 @@ function Atk.new(name, dmg, sp)
   return {name=name, dmg=dmg, sp=sp}
 end
 
-utils.addloadhook(function ()
-  imagecache[DEFAULT_IMAGE] = love.graphics.newImage(DEFAULT_IMAGE)
-end)
 
 
 ---@param name string

@@ -5,33 +5,58 @@ local System = require("ecs").System
 local World = require "ecs"
 local Entity = require("ecs.entity").new()
 
+function isobj(obj)
+  if type(obj) == 'table' and obj.id
+  then
+    return true
+  else
+    return false
+  end
+end
+
+function getid(obj)
+  if isobj(obj) then
+    return obj.id
+  else
+    return type(obj)
+  end
+end
+
 function love.load()
-  utils.loadhooks()
+  require'utils.load_hooks'.loadhooks()
 
   local world = World.new()
   for _, system in pairs(require "systems") do
     world:add_system(system)
   end
-  world:add(require "player")
+  world:add(require'plants.peashooter'.new(0, 0))
+  world:add(require'plants.peashooter'.new(0, 1))
+  world:add(require'plants.peashooter'.new(1, 1))
+  world:add(require'plants.peashooter'.new(2, 1))
+  world:add_draw_system({id='FPSCounter', target_id='None', action=function (world, self)
+    local now = 1/world.info.dt
+    love.graphics.printf(('FPS: %d'):format(now), 10, 10, 100)
+  end})
 
-  world:add_system {
+  local Dbg = {
     id='Debug',
-    target_id='Position',
-    action=function (world, pos)
-      -- print(pos.x ..' '.. pos.y)
+    target_id='None',
+    action=function (world, body)
     end
   }
 
+  world:add_system(Dbg)
+
   SCREEN_STACK:push {
-    update = function()
-      world:iteration()
+    update = function(dt)
+      world:update(dt)
     end,
     draw = function() world:draw() end,
   }
 end
 
-function love.update(t)
-  SCREEN_STACK:update()
+function love.update(dt)
+  SCREEN_STACK:update(dt)
 end
 
 function love.draw()

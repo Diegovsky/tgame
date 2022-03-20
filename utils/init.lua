@@ -1,13 +1,5 @@
-local loadhooks = {}
 local M = {}
-function M.addloadhook(cb)
-  table.insert(loadhooks, cb)
-end
-function M.loadhooks()
-  for _, cb in ipairs(loadhooks) do
-    cb()
-  end
-end
+
 function M.contains_val(arr, el)
   for _, val in ipairs(arr) do
     if el == val then
@@ -37,6 +29,8 @@ function M.Registry()
     end
   })
 end
+
+M.image = require'utils.image_cache'.image
 
 return M
 
