@@ -90,6 +90,7 @@ function World:iteration(systems)
 end
 
 function World:update(dt)
+  -- assert(type(dt) == 'number')
   self.info.dt = dt
   self:iteration(self.systems)
 end
@@ -97,7 +98,6 @@ end
 --- Due to the way Love2D works, a system that draws is special
 --- cased and treated differently from other systems.
 function World:draw()
-  -- self.info.dt = nil
   self:iteration(self.draw_systems)
 end
 

@@ -66,7 +66,7 @@ function M:delegate(name, ...)
   do
     local f = screen[name]
     if f then
-      f(...)
+      f(screen, ...)
     end
   end
 end

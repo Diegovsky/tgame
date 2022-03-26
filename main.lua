@@ -4,6 +4,7 @@ SCREEN_STACK = require "screen"
 local System = require("ecs").System
 local World = require "ecs"
 local Entity = require("ecs.entity").new()
+local ConsScreen = require'cons_screen'
 
 function isobj(obj)
   if type(obj) == 'table' and obj.id
@@ -19,6 +20,28 @@ function getid(obj)
     return obj.id
   else
     return type(obj)
+  end
+end
+
+function listfields(tbl)
+  local f = {}
+  if type(tbl) ~= 'table' then
+    return nil
+  end
+  for k, _ in pairs(tbl) do
+    table.insert(f, k)
+  end
+  for k, _ in ipairs(tbl) do
+    table.insert(k, k)
+  end
+  return table.concat(f, ', ')
+end
+
+function describe(obj)
+  if isobj(obj) then
+    return obj.id
+  else
+    return listfields(obj) or type(obj)
   end
 end
 
@@ -46,13 +69,9 @@ function love.load()
   }
 
   world:add_system(Dbg)
+  local cscr = ConsScreen.new(world, require'debugui'.new())
 
-  SCREEN_STACK:push {
-    update = function(dt)
-      world:update(dt)
-    end,
-    draw = function() world:draw() end,
-  }
+  SCREEN_STACK:push (cscr)
 end
 
 function love.update(dt)
